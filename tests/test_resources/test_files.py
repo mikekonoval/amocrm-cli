@@ -67,9 +67,18 @@ def test_get_file(mock_client: MagicMock) -> None:
 @respx.mock
 def test_upload_file(mock_client: MagicMock, tmp_path: Path) -> None:
     test_file = tmp_path / "test.txt"
-    test_file.write_text("hello")
-    respx.post(f"{DRIVE_BASE}/package").mock(
-        return_value=httpx.Response(200, json={"_links": {}, "_embedded": {"files": [SAMPLE_FILE]}})
+    test_file.write_bytes(b"hello")
+    upload_url = "https://drive-a.amocrm.ru/upload/session-jwt-token"
+    respx.post(f"{DRIVE_BASE}/sessions").mock(
+        return_value=httpx.Response(200, json={
+            "session_id": 123,
+            "upload_url": upload_url,
+            "max_part_size": 524288,
+            "max_file_size": 314572800,
+        })
+    )
+    respx.post(upload_url).mock(
+        return_value=httpx.Response(200, json=SAMPLE_FILE)
     )
     resource = FilesResource(mock_client)
     result = resource.upload(str(test_file))
@@ -79,9 +88,12 @@ def test_upload_file(mock_client: MagicMock, tmp_path: Path) -> None:
 @respx.mock
 def test_download_file(mock_client: MagicMock) -> None:
     content = b"binary file content"
-    respx.get(f"{DRIVE_BASE}/files/abc-123/download").mock(
-        return_value=httpx.Response(200, content=content)
+    download_url = "https://drive-a.amocrm.ru/download/acct-hash/abc-123/photo.jpg"
+    file_with_links = {**SAMPLE_FILE, "_links": {"download": {"href": download_url}}}
+    respx.get(f"{DRIVE_BASE}/files/abc-123").mock(
+        return_value=httpx.Response(200, json=file_with_links)
     )
+    respx.get(download_url).mock(return_value=httpx.Response(200, content=content))
     resource = FilesResource(mock_client)
     result = resource.download("abc-123")
     assert result == content

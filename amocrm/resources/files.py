@@ -64,20 +64,50 @@ class FilesResource:
         return result
 
     def upload(self, file_path: str) -> dict[str, Any]:
-        """Upload a file. Returns the created file metadata dict."""
+        """Upload a file using session-based chunked upload. Returns file metadata dict."""
         path = Path(file_path)
+        file_size = path.stat().st_size
+
+        # Step 1: create upload session
+        session_resp = httpx.post(
+            f"{_DRIVE_BASE}/sessions",
+            headers={**self._headers(), "Content-Type": "application/json"},
+            json={"file_name": path.name, "file_size": file_size},
+        )
+        self._raise_for_error(session_resp)
+        session_data: dict[str, Any] = session_resp.json()
+        upload_url: str = session_data["upload_url"]
+        max_part_size: int = int(session_data.get("max_part_size", 524288))
+
+        # Step 2: upload in chunks; server returns next_url until final chunk returns uuid
+        result: dict[str, Any] = {}
         with open(path, "rb") as f:
-            files = {"file": (path.name, f)}
-            response = httpx.post(f"{_DRIVE_BASE}/package", headers=self._headers(), files=files)
-        self._raise_for_error(response)
-        data: dict[str, Any] = response.json()
-        embedded = data.get("_embedded", {})
-        items: list[dict[str, Any]] = embedded.get("files", [])
-        return items[0] if items else {}
+            while True:
+                chunk = f.read(max_part_size)
+                if not chunk:
+                    break
+                chunk_resp = httpx.post(
+                    upload_url,
+                    content=chunk,
+                    headers={**self._headers(), "Content-Type": "application/octet-stream"},
+                )
+                self._raise_for_error(chunk_resp)
+                data: dict[str, Any] = chunk_resp.json()
+                if "uuid" in data:
+                    result = data
+                    break
+                upload_url = data.get("next_url", upload_url)
+        return result
 
     def download(self, uuid: str) -> bytes:
-        """Download file content. Returns raw bytes."""
-        response = httpx.get(f"{_DRIVE_BASE}/files/{uuid}/download", headers=self._headers())
+        """Download file content. Returns raw bytes.
+
+        Fetches the file metadata first to get the node-specific download URL,
+        since files may be stored on a different drive node than _DRIVE_BASE.
+        """
+        meta = self.get(uuid)
+        download_url: str = meta["_links"]["download"]["href"]
+        response = httpx.get(download_url, headers=self._headers())
         if response.status_code == 204:
             raise EntityNotFoundError(f"/files/{uuid}")
         self._raise_for_error(response)
