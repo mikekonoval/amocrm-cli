@@ -21,7 +21,7 @@ mypy amocrm/                      # type check
 - `amocrm/auth/` — credential storage (`~/.amocrm/config.json`), long-lived token mode, full OAuth 2.0 flow with auto-refresh. `oauth.py` calls httpx directly (not via `AmoCRMClient`) because token exchange happens before auth is established.
 - `amocrm/resources/` — pure Python API functions. No CLI, no Typer. Each file has one `{Name}Resource` class subclassing `BaseResource`.
 - `amocrm/commands/` — Typer CLI commands. Calls resource methods, formats output via `output.py`. No HTTP here.
-- `amocrm/client.py` — the only file that uses httpx. Rate-limits at 7 req/s, retries on 429/503/504 with exponential backoff, handles 204 semantics, proactive/reactive OAuth token refresh.
+- `amocrm/client.py` — the main httpx file. Rate-limits at 7 req/s, retries on 429/503/504 with exponential backoff, handles 204 semantics, proactive/reactive OAuth token refresh. Exception: `amocrm/resources/files.py` also calls httpx directly (drive-b.amocrm.ru is a separate domain) and `amocrm/auth/oauth.py` calls httpx directly (token exchange happens before client is initialized).
 - `amocrm/exceptions.py` — `AmoCRMAPIError` and `EntityNotFoundError`. Import from here everywhere.
 
 ## TDD Workflow
@@ -91,6 +91,8 @@ results = leads.list(filters={"pipeline_id": [1]}, order="created_at:desc")
 - `pipelines create` requires `is_unsorted_on` + `_embedded.statuses` (at least one) — bare `{"name": "..."}` returns 400
 - Stage colors: only specific hex values accepted by the API (e.g. `#fffeb2`, `#fffeb2`, `#D5D8DB`); arbitrary hex returns 400
 - OAuth consent URL uses `www.amocrm.ru`, not the account subdomain
+- Files upload is two-step: `POST /v1.0/sessions` (get upload_url + max_part_size) → `POST upload_url` with raw bytes in chunks; the upload_url is a JWT on drive-a.amocrm.ru, not drive-b
+- Files download: fetch metadata first via `get(uuid)`, use `_links.download.href` — files may be on a different drive node than `_DRIVE_BASE`
 
 ## mypy Notes
 
