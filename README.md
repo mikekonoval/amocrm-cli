@@ -17,7 +17,9 @@ amocrm files upload report.pdf
 ## Установка
 
 ```bash
-pip install -e .
+git clone https://github.com/mikekonoval/amocrm-cli
+cd amocrm-cli
+pip install .
 ```
 
 Требуется Python 3.11+.
@@ -45,7 +47,7 @@ amocrm files upload report.pdf
 from amocrm import AmoCRMClient
 from amocrm.resources import LeadsResource
 
-client = AmoCRMClient(subdomain="mycompany", access_token="xxx")
+client = AmoCRMClient(subdomain="yoursubdomain", access_token="your_token")
 leads = LeadsResource(client)
 
 results = leads.list(filters={"pipeline_id": [1]}, order="created_at:desc")
