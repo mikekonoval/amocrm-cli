@@ -23,7 +23,7 @@ def render(
         typer.echo("(no results)")
         return
     if output == "json":
-        print(json.dumps(data, indent=2, ensure_ascii=False))
+        typer.echo(json.dumps(data, indent=2, ensure_ascii=False))
     elif output == "csv":
         cols = columns or list(data[0].keys())
         writer = csv.DictWriter(sys.stdout, fieldnames=cols, extrasaction="ignore")

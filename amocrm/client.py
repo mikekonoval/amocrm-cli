@@ -17,7 +17,6 @@ Construction modes:
 """
 from __future__ import annotations
 
-from amocrm.exceptions import AmoCRMAPIError, EntityNotFoundError
 
 __all__ = ["AmoCRMClient"]
 

@@ -3,7 +3,6 @@ import httpx
 import pytest
 from amocrm.client import AmoCRMClient
 from amocrm.resources.base import BaseResource, _build_filter_params, _build_order_params
-from amocrm.exceptions import EntityNotFoundError
 
 
 class SampleResource(BaseResource):

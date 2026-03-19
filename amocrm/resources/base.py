@@ -1,7 +1,7 @@
 """BaseResource: CRUD mixin for all AmoCRM resources."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from amocrm.client import AmoCRMClient
@@ -36,8 +36,8 @@ def _build_order_params(order: str) -> dict:
 
 
 class BaseResource:
-    path: str       # e.g. "/leads"
-    embedded_key: str  # e.g. "leads"
+    path: ClassVar[str]       # e.g. "/leads"
+    embedded_key: ClassVar[str]  # e.g. "leads"
 
     def __init__(self, client: AmoCRMClient) -> None:
         self.client = client
