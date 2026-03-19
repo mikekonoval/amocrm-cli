@@ -7,7 +7,7 @@
 Токен генерируется в AmoCRM: **amoМаркет → Создать интеграцию → Внешняя интеграция**.
 
 ```bash
-amocrm auth login --token <токен> --subdomain mycompany
+amocrm auth login --token <токен> --subdomain yoursubdomain
 amocrm auth status
 amocrm auth logout
 ```
@@ -15,7 +15,7 @@ amocrm auth logout
 ### OAuth 2.0 (нужен для Chats API)
 
 ```bash
-amocrm auth login --oauth --subdomain mycompany \
+amocrm auth login --oauth --subdomain yoursubdomain \
   --client-id <id> --client-secret <secret>
 ```
 
@@ -222,15 +222,15 @@ from amocrm import AmoCRMClient, AmoCRMAPIError, EntityNotFoundError
 from amocrm.resources import LeadsResource, ContactsResource, FilesResource
 
 # Долгосрочный токен
-client = AmoCRMClient(subdomain="mycompany", access_token="xxx")
+client = AmoCRMClient(subdomain="yoursubdomain", access_token="your_token")
 
 # OAuth с автообновлением токена
 client = AmoCRMClient(
-    subdomain="mycompany",
-    access_token="xxx",
-    refresh_token="yyy",
-    client_id="zzz",
-    client_secret="aaa",
+    subdomain="yoursubdomain",
+    access_token="your_token",
+    refresh_token="your_refresh_token",
+    client_id="your_client_id",
+    client_secret="your_client_secret",
     expires_at=1234567890,
 )
 
