@@ -7,7 +7,7 @@ from pathlib import Path
 CONFIG_PATH = Path.home() / ".amocrm" / "config.json"
 VALID_AUTH_MODES = {"longtoken", "oauth"}
 
-_DEFAULTS: dict = {
+_DEFAULTS: dict[str, object] = {
     "refresh_token": None,
     "expires_at": None,
     "client_id": None,
@@ -16,7 +16,7 @@ _DEFAULTS: dict = {
 }
 
 
-def load_config() -> dict:
+def load_config() -> dict[str, object]:
     """Load config from disk. Raises FileNotFoundError if missing, ValueError if invalid."""
     if not CONFIG_PATH.exists():
         raise FileNotFoundError(
@@ -31,7 +31,7 @@ def load_config() -> dict:
     return {**_DEFAULTS, **data}
 
 
-def save_config(config: dict) -> None:
+def save_config(config: dict[str, object]) -> None:
     """Write config to disk. Creates parent directory if needed."""
     CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     CONFIG_PATH.write_text(json.dumps(config, indent=2))

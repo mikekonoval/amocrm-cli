@@ -13,7 +13,7 @@ def is_token_expiring(expires_at: int | None) -> bool:
     return (expires_at - int(time.time())) < REFRESH_THRESHOLD_SECONDS
 
 
-def make_longtoken_config(subdomain: str, token: str) -> dict:
+def make_longtoken_config(subdomain: str, token: str) -> dict[str, object]:
     """Build a config dict for long-lived token auth mode."""
     return {
         "subdomain": subdomain,
