@@ -120,7 +120,7 @@ class AmoCRMClient:
     def _handle_error_response(self, response: httpx.Response) -> None:
         """Raise AmoCRMAPIError if response indicates an error."""
         ct = response.headers.get("content-type", "")
-        is_error_status = response.status_code in (400, 401, 403, 422, 500)
+        is_error_status = response.status_code >= 400
         is_problem_json = "application/problem+json" in ct
 
         if is_problem_json or is_error_status:
