@@ -1,7 +1,7 @@
 """EventsResource for AmoCRM API v4 — read-only, limit clamped to 100."""
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import Any, ClassVar, List
 
 from amocrm.resources.base import BaseResource
 
@@ -18,10 +18,10 @@ class EventsResource(BaseResource):
         self,
         page: int = 1,
         limit: int = 50,
-        filters: dict | None = None,
+        filters: dict[str, Any] | None = None,
         order: str | None = None,
-        with_: list[str] | None = None,
-    ) -> list[dict]:
+        with_: List[str] | None = None,
+    ) -> List[dict[str, Any]]:
         """List events. Limit is silently clamped to max 100."""
         limit = min(limit, MAX_EVENTS_LIMIT)
         return super().list(page=page, limit=limit, filters=filters, order=order, with_=with_)

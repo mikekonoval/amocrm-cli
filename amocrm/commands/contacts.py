@@ -70,7 +70,7 @@ def create_contact(
 ) -> None:
     """Create a new contact."""
     try:
-        data: dict = {"name": name}
+        data: dict[str, object] = {"name": name}
         if email is not None:
             data["email"] = email
         if phone is not None:
@@ -78,6 +78,34 @@ def create_contact(
         resource = _get_resource()
         results = resource.create([data])
         render(results, output=output)
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1)
+
+
+@app.command("update")
+def update_contact(
+    id: int = typer.Argument(...),
+    name: Optional[str] = typer.Option(None, "--name"),
+    email: Optional[str] = typer.Option(None, "--email"),
+    phone: Optional[str] = typer.Option(None, "--phone"),
+    output: str = typer.Option("table", "--output"),
+) -> None:
+    """Update a contact by ID."""
+    try:
+        data: dict[str, object] = {}
+        if name is not None:
+            data["name"] = name
+        if email is not None:
+            data["email"] = email
+        if phone is not None:
+            data["phone"] = phone
+        if not data:
+            typer.echo("Provide at least one field to update.", err=True)
+            raise typer.Exit(1)
+        resource = _get_resource()
+        result = resource.update(id, data)
+        render(result, output=output)
     except (AmoCRMAPIError, EntityNotFoundError) as e:
         typer.echo(str(e), err=True)
         raise typer.Exit(1)

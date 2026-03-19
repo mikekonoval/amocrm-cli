@@ -70,7 +70,7 @@ def create_lead(
 ) -> None:
     """Create a new lead."""
     try:
-        data: dict = {"name": name}
+        data: dict[str, object] = {"name": name}
         if price is not None:
             data["price"] = price
         if pipeline_id is not None:
@@ -78,6 +78,37 @@ def create_lead(
         resource = _get_resource()
         results = resource.create([data])
         render(results, output=output)
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1)
+
+
+@app.command("update")
+def update_lead(
+    id: int = typer.Argument(...),
+    name: Optional[str] = typer.Option(None, "--name"),
+    price: Optional[int] = typer.Option(None, "--price"),
+    pipeline_id: Optional[int] = typer.Option(None, "--pipeline-id"),
+    status_id: Optional[int] = typer.Option(None, "--status-id"),
+    output: str = typer.Option("table", "--output"),
+) -> None:
+    """Update a lead by ID."""
+    try:
+        data: dict[str, object] = {}
+        if name is not None:
+            data["name"] = name
+        if price is not None:
+            data["price"] = price
+        if pipeline_id is not None:
+            data["pipeline_id"] = pipeline_id
+        if status_id is not None:
+            data["status_id"] = status_id
+        if not data:
+            typer.echo("Provide at least one field to update.", err=True)
+            raise typer.Exit(1)
+        resource = _get_resource()
+        result = resource.update(id, data)
+        render(result, output=output)
     except (AmoCRMAPIError, EntityNotFoundError) as e:
         typer.echo(str(e), err=True)
         raise typer.Exit(1)

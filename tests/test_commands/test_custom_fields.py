@@ -47,3 +47,26 @@ def test_list_groups():
         with patch("amocrm.commands.custom_fields.AmoCRMClient"):
             result = runner.invoke(app, ["groups", "list", "--entity", "leads", "--output", "json"])
     assert result.exit_code == 0
+
+
+def test_create_field_command():
+    with patch("amocrm.commands.custom_fields.CustomFieldsResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.create.return_value = [{"id": 1, "name": "Budget"}]
+        with patch("amocrm.commands.custom_fields.AmoCRMClient"):
+            result = runner.invoke(app, ["create", "--entity", "leads", "--name", "Budget", "--type", "text"])
+    assert result.exit_code == 0
+    call_args = mock_resource.create.call_args[0][0][0]
+    assert call_args["name"] == "Budget"
+    assert call_args["type"] == "text"
+
+
+def test_delete_field_command():
+    with patch("amocrm.commands.custom_fields.CustomFieldsResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.delete.return_value = True
+        with patch("amocrm.commands.custom_fields.AmoCRMClient"):
+            result = runner.invoke(app, ["delete", "1", "--entity", "leads"])
+    assert result.exit_code == 0

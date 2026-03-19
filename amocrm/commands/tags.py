@@ -72,6 +72,23 @@ def create_tag(
         raise typer.Exit(1)
 
 
+@app.command("update")
+def update_tag(
+    id: int = typer.Argument(...),
+    entity: str = typer.Option(..., "--entity", help="Entity type: leads, contacts, companies"),
+    name: str = typer.Option(..., "--name"),
+    output: str = typer.Option("table", "--output"),
+) -> None:
+    """Update a tag by ID."""
+    try:
+        resource = TagsResource(AmoCRMClient(), entity_type=entity)
+        result = resource.update(id, {"name": name})
+        render(result, output=output)
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1)
+
+
 @app.command("delete")
 def delete_tag(
     id: int = typer.Argument(...),

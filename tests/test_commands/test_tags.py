@@ -54,3 +54,22 @@ def test_delete_command():
         with patch("amocrm.commands.tags.AmoCRMClient"):
             result = runner.invoke(app, ["delete", "1", "--entity", "leads"])
     assert result.exit_code == 0
+
+def test_update_tag_command():
+    with patch("amocrm.commands.tags.TagsResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.update.return_value = {"id": 5, "name": "VIP"}
+        with patch("amocrm.commands.tags.AmoCRMClient"):
+            result = runner.invoke(app, ["update", "5", "--entity", "leads", "--name", "VIP"])
+    assert result.exit_code == 0
+    mock_resource.update.assert_called_once_with(5, {"name": "VIP"})
+
+def test_delete_tag_command():
+    with patch("amocrm.commands.tags.TagsResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.delete.return_value = True
+        with patch("amocrm.commands.tags.AmoCRMClient"):
+            result = runner.invoke(app, ["delete", "5", "--entity", "leads"])
+    assert result.exit_code == 0

@@ -13,7 +13,7 @@ console = Console()
 
 
 def render(
-    data: list[dict] | dict,
+    data: list[dict[str, object]] | dict[str, object],
     output: str = "table",
     columns: list[str] | None = None,
 ) -> None:

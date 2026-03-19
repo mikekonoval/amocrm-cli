@@ -1,6 +1,8 @@
 """WebhooksResource — subscribe/unsubscribe webhooks in AmoCRM."""
 from __future__ import annotations
 
+from typing import Any
+
 from amocrm.exceptions import EntityNotFoundError
 from amocrm.resources.base import BaseResource
 
@@ -11,7 +13,7 @@ class WebhooksResource(BaseResource):
     path = "/webhooks"
     embedded_key = "hooks"  # AmoCRM uses "hooks" not "webhooks"
 
-    def subscribe(self, destination: str, settings: list[str]) -> dict:
+    def subscribe(self, destination: str, settings: list[str]) -> dict[str, Any]:
         """POST to /webhooks to register a new webhook."""
         response = self.client.post(self.path, json={"destination": destination, "settings": settings})
         if isinstance(response, dict):

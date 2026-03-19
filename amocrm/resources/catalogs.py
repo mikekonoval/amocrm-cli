@@ -22,4 +22,4 @@ class CatalogElementsResource(BaseResource):
 
     def __init__(self, client: AmoCRMClient, catalog_id: int) -> None:
         super().__init__(client)
-        self.path = f"/catalogs/{catalog_id}/elements"
+        self.path = f"/catalogs/{catalog_id}/elements"  # type: ignore[misc]

@@ -67,16 +67,17 @@ class AmoCRMClient:
             config = load_config()
             self._subdomain = str(config["subdomain"])
             self._access_token = str(config["access_token"])
-            self._refresh_token = config.get("refresh_token") or None
-            self._client_id = config.get("client_id") or None
-            self._client_secret = config.get("client_secret") or None
-            self._expires_at = config.get("expires_at") or None
+            self._refresh_token = str(config["refresh_token"]) if config.get("refresh_token") else None
+            self._client_id = str(config["client_id"]) if config.get("client_id") else None
+            self._client_secret = str(config["client_secret"]) if config.get("client_secret") else None
+            expires = config.get("expires_at")
+            self._expires_at = int(expires) if isinstance(expires, (int, float)) else None
             self._auth_mode = str(config.get("auth_mode", "longtoken"))
             self._redirect_uri = str(config.get("redirect_uri", "http://localhost:8080"))
             self._config_mode = True  # write refreshed tokens back to config
 
             # Proactive refresh in config-file mode
-            if self._auth_mode == "oauth" and is_token_expiring(self._expires_at):  # type: ignore[arg-type]
+            if self._auth_mode == "oauth" and is_token_expiring(self._expires_at):
                 self._do_refresh(write_config=True)
 
         self._base_url = f"https://{self._subdomain}.amocrm.ru/api/v4"
@@ -97,7 +98,7 @@ class AmoCRMClient:
         )
         self._access_token = str(result["access_token"])
         self._refresh_token = str(result["refresh_token"])
-        self._expires_at = int(result["expires_at"])  # type: ignore[arg-type]
+        self._expires_at = int(result["expires_at"])  # type: ignore[call-overload]
 
         if write_config:
             config = load_config()

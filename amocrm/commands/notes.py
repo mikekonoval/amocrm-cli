@@ -73,6 +73,24 @@ def create_note(
         raise typer.Exit(1)
 
 
+@app.command("update")
+def update_note(
+    id: int = typer.Argument(...),
+    entity: str = typer.Option(..., "--entity", help="Entity type: leads, contacts, companies, tasks"),
+    entity_id: Optional[int] = typer.Option(None, "--entity-id"),
+    text: str = typer.Option(..., "--text"),
+    output: str = typer.Option("table", "--output"),
+) -> None:
+    """Update a note by ID."""
+    try:
+        resource = NotesResource(AmoCRMClient(), entity_type=entity, entity_id=entity_id)
+        result = resource.update(id, {"note_type": "common", "params": {"text": text}})
+        render(result, output=output)
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1)
+
+
 @app.command("delete")
 def delete_note(
     id: int = typer.Argument(...),

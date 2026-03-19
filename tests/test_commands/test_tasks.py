@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch, MagicMock
 from typer.testing import CliRunner
 from amocrm.commands.tasks import app
@@ -51,3 +50,14 @@ def test_delete_command():
         with patch("amocrm.commands.tasks.AmoCRMClient"):
             result = runner.invoke(app, ["delete", "1"])
     assert result.exit_code == 0
+
+
+def test_update_command():
+    with patch("amocrm.commands.tasks.TasksResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.update.return_value = {"id": 1, "text": "Updated"}
+        with patch("amocrm.commands.tasks.AmoCRMClient"):
+            result = runner.invoke(app, ["update", "1", "--text", "Updated", "--output", "json"])
+    assert result.exit_code == 0
+    mock_resource.update.assert_called_once_with(1, {"text": "Updated"})

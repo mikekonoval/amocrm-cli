@@ -68,10 +68,32 @@ def create_company(
 ) -> None:
     """Create a new company."""
     try:
-        data: dict = {"name": name}
+        data: dict[str, object] = {"name": name}
         resource = _get_resource()
         results = resource.create([data])
         render(results, output=output)
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1)
+
+
+@app.command("update")
+def update_company(
+    id: int = typer.Argument(...),
+    name: Optional[str] = typer.Option(None, "--name"),
+    output: str = typer.Option("table", "--output"),
+) -> None:
+    """Update a company by ID."""
+    try:
+        data: dict[str, object] = {}
+        if name is not None:
+            data["name"] = name
+        if not data:
+            typer.echo("Provide at least one field to update.", err=True)
+            raise typer.Exit(1)
+        resource = _get_resource()
+        result = resource.update(id, data)
+        render(result, output=output)
     except (AmoCRMAPIError, EntityNotFoundError) as e:
         typer.echo(str(e), err=True)
         raise typer.Exit(1)

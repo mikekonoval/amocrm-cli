@@ -118,3 +118,24 @@ def test_delete_element_command():
     assert result.exit_code == 0
     mock_cls.assert_called_once_with(mock.ANY, catalog_id=1)
     mock_resource.delete.assert_called_once_with(10)
+
+
+def test_elements_update():
+    with patch("amocrm.commands.catalogs.CatalogElementsResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.update.return_value = {"id": 10, "name": "Updated"}
+        with patch("amocrm.commands.catalogs.AmoCRMClient"):
+            result = runner.invoke(app, ["elements", "update", "1", "10", "--name", "Updated"])
+    assert result.exit_code == 0
+    mock_resource.update.assert_called_once_with(10, {"name": "Updated"})
+
+
+def test_elements_delete():
+    with patch("amocrm.commands.catalogs.CatalogElementsResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.delete.return_value = True
+        with patch("amocrm.commands.catalogs.AmoCRMClient"):
+            result = runner.invoke(app, ["elements", "delete", "1", "10"])
+    assert result.exit_code == 0

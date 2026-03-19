@@ -1,8 +1,7 @@
 import json
 import pytest
-from pathlib import Path
 from unittest.mock import patch
-from amocrm.auth.config import load_config, save_config, CONFIG_PATH
+from amocrm.auth.config import load_config, save_config
 
 
 def test_load_config_reads_json(tmp_path):

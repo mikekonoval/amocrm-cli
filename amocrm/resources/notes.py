@@ -18,6 +18,6 @@ class NotesResource(BaseResource):
     def __init__(self, client: AmoCRMClient, entity_type: str, entity_id: int | None = None) -> None:
         super().__init__(client)
         if entity_id is not None:
-            self.path = f"/{entity_type}/{entity_id}/notes"
+            self.path = f"/{entity_type}/{entity_id}/notes"  # type: ignore[misc]
         else:
-            self.path = f"/{entity_type}/notes"
+            self.path = f"/{entity_type}/notes"  # type: ignore[misc]

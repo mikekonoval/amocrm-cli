@@ -139,6 +139,29 @@ def create_element(
         raise typer.Exit(1)
 
 
+@elements_app.command("update")
+def update_element(
+    catalog_id: int = typer.Argument(...),
+    id: int = typer.Argument(...),
+    name: Optional[str] = typer.Option(None, "--name"),
+    output: str = typer.Option("table", "--output"),
+) -> None:
+    """Update a catalog element by ID."""
+    try:
+        data: dict[str, object] = {}
+        if name is not None:
+            data["name"] = name
+        if not data:
+            typer.echo("Provide at least one field to update.", err=True)
+            raise typer.Exit(1)
+        resource = _get_elements_resource(catalog_id)
+        result = resource.update(id, data)
+        render(result, output=output)
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1)
+
+
 @elements_app.command("delete")
 def delete_element(
     catalog_id: int = typer.Argument(...),

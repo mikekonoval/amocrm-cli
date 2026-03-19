@@ -50,6 +50,38 @@ def get_field(
         raise typer.Exit(1)
 
 
+@app.command("create")
+def create_field(
+    entity: str = typer.Option(..., "--entity", help="Entity: leads, contacts, companies, tasks"),
+    name: str = typer.Option(..., "--name"),
+    type: str = typer.Option(..., "--type", help="Field type: text, numeric, checkbox, select, multiselect, date, url, textarea, radiobutton"),
+    output: str = typer.Option("table", "--output"),
+) -> None:
+    """Create a custom field for an entity."""
+    try:
+        resource = CustomFieldsResource(AmoCRMClient(), entity=entity)
+        results = resource.create([{"name": name, "type": type}])
+        render(results, output=output)
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1)
+
+
+@app.command("delete")
+def delete_field(
+    id: int = typer.Argument(...),
+    entity: str = typer.Option(..., "--entity", help="Entity: leads, contacts, companies, tasks"),
+) -> None:
+    """Delete a custom field by ID."""
+    try:
+        resource = CustomFieldsResource(AmoCRMClient(), entity=entity)
+        resource.delete(id)
+        typer.echo(f"Custom field {id} deleted.")
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1)
+
+
 @groups_app.command("list")
 def list_groups(
     entity: str = typer.Option(..., "--entity", help="Entity type: leads, contacts, companies"),

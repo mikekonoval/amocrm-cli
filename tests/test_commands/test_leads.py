@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch, MagicMock
 from typer.testing import CliRunner
 from amocrm.commands.leads import app
@@ -64,3 +63,34 @@ def test_delete_command():
         with patch("amocrm.commands.leads.AmoCRMClient"):
             result = runner.invoke(app, ["delete", "1"])
     assert result.exit_code == 0
+
+def test_update_command():
+    with patch("amocrm.commands.leads.LeadsResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.update.return_value = SAMPLE_LEAD
+        with patch("amocrm.commands.leads.AmoCRMClient"):
+            result = runner.invoke(app, ["update", "1", "--price", "99000", "--output", "json"])
+    assert result.exit_code == 0
+    mock_resource.update.assert_called_once_with(1, {"price": 99000})
+
+def test_update_name_and_price():
+    with patch("amocrm.commands.leads.LeadsResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.update.return_value = SAMPLE_LEAD
+        with patch("amocrm.commands.leads.AmoCRMClient"):
+            result = runner.invoke(app, ["update", "1", "--name", "Renamed", "--price", "500"])
+    assert result.exit_code == 0
+    call_kwargs = mock_resource.update.call_args
+    assert call_kwargs[0][1]["name"] == "Renamed"
+    assert call_kwargs[0][1]["price"] == 500
+
+def test_update_not_found_exits_1():
+    with patch("amocrm.commands.leads.LeadsResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.update.side_effect = EntityNotFoundError("/leads/999")
+        with patch("amocrm.commands.leads.AmoCRMClient"):
+            result = runner.invoke(app, ["update", "999", "--price", "100"])
+    assert result.exit_code == 1

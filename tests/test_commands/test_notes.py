@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch, MagicMock
 from typer.testing import CliRunner
 from amocrm.commands.notes import app
@@ -49,3 +48,13 @@ def test_get_not_found_exits_1():
         with patch("amocrm.commands.notes.AmoCRMClient"):
             result = runner.invoke(app, ["get", "999", "--entity", "leads"])
     assert result.exit_code == 1
+
+def test_update_note_command():
+    with patch("amocrm.commands.notes.NotesResource") as mock_cls:
+        mock_resource = MagicMock()
+        mock_cls.return_value = mock_resource
+        mock_resource.update.return_value = {"id": 10, "text": "Updated note"}
+        with patch("amocrm.commands.notes.AmoCRMClient"):
+            result = runner.invoke(app, ["update", "10", "--entity", "leads", "--text", "Updated note"])
+    assert result.exit_code == 0
+    mock_resource.update.assert_called_once_with(10, {"note_type": "common", "params": {"text": "Updated note"}})

@@ -17,7 +17,7 @@ class CustomFieldsResource(BaseResource):
 
     def __init__(self, client: AmoCRMClient, entity: str) -> None:
         super().__init__(client)
-        self.path = f"/{entity}/custom_fields"
+        self.path = f"/{entity}/custom_fields"  # type: ignore[misc]
 
 
 class CustomFieldGroupsResource(BaseResource):
@@ -26,4 +26,4 @@ class CustomFieldGroupsResource(BaseResource):
 
     def __init__(self, client: AmoCRMClient, entity: str) -> None:
         super().__init__(client)
-        self.path = f"/{entity}/custom_fields/groups"
+        self.path = f"/{entity}/custom_fields/groups"  # type: ignore[misc]

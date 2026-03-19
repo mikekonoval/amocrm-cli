@@ -17,4 +17,4 @@ class TagsResource(BaseResource):
 
     def __init__(self, client: AmoCRMClient, entity_type: str) -> None:
         super().__init__(client)
-        self.path = f"/{entity_type}/tags"
+        self.path = f"/{entity_type}/tags"  # type: ignore[misc]

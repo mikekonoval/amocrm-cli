@@ -1,5 +1,4 @@
 import time
-import pytest
 from amocrm.auth.token import is_token_expiring, make_longtoken_config
 
 

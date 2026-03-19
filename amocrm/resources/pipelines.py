@@ -27,4 +27,4 @@ class StagesResource(BaseResource):
 
     def __init__(self, client: AmoCRMClient, pipeline_id: int) -> None:
         super().__init__(client)
-        self.path = f"/leads/pipelines/{pipeline_id}/statuses"
+        self.path = f"/leads/pipelines/{pipeline_id}/statuses"  # type: ignore[misc]

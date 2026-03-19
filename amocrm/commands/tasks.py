@@ -86,6 +86,34 @@ def create_task(
         raise typer.Exit(1)
 
 
+@app.command("update")
+def update_task(
+    id: int = typer.Argument(...),
+    text: Optional[str] = typer.Option(None, "--text"),
+    complete_till: Optional[int] = typer.Option(None, "--complete-till", help="Unix timestamp"),
+    is_completed: Optional[bool] = typer.Option(None, "--is-completed"),
+    output: str = typer.Option("table", "--output"),
+) -> None:
+    """Update a task by ID."""
+    try:
+        data: dict[str, object] = {}
+        if text is not None:
+            data["text"] = text
+        if complete_till is not None:
+            data["complete_till"] = complete_till
+        if is_completed is not None:
+            data["is_completed"] = is_completed
+        if not data:
+            typer.echo("Provide at least one field to update.", err=True)
+            raise typer.Exit(1)
+        resource = _get_resource()
+        result = resource.update(id, data)
+        render(result, output=output)
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
+        typer.echo(str(e), err=True)
+        raise typer.Exit(1)
+
+
 @app.command("delete")
 def delete_task(
     id: int = typer.Argument(...),

@@ -1,20 +1,22 @@
 """BaseResource: CRUD mixin for all AmoCRM resources."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, List, cast
 
 if TYPE_CHECKING:
     from amocrm.client import AmoCRMClient
 
+from amocrm.exceptions import EntityNotFoundError
+
 __all__ = ["BaseResource"]
 
 
-def _build_filter_params(filters: dict, prefix: str = "filter") -> dict:
+def _build_filter_params(filters: dict[str, Any], prefix: str = "filter") -> dict[str, Any]:
     """Convert nested dict to bracket-notation query params.
     {"pipeline_id": [1,2]} → {"filter[pipeline_id][0]": 1, "filter[pipeline_id][1]": 2}
     {"created_at": {"from": 1700000}} → {"filter[created_at][from]": 1700000}
     """
-    result: dict = {}
+    result: dict[str, Any] = {}
     for key, value in filters.items():
         if isinstance(value, list):
             for i, item in enumerate(value):
@@ -27,7 +29,7 @@ def _build_filter_params(filters: dict, prefix: str = "filter") -> dict:
     return result
 
 
-def _build_order_params(order: str) -> dict:
+def _build_order_params(order: str) -> dict[str, str]:
     """Convert "field:direction" to {"order[field]": "direction"}.
     "created_at:asc" → {"order[created_at]": "asc"}
     """
@@ -46,48 +48,51 @@ class BaseResource:
         self,
         page: int = 1,
         limit: int = 50,
-        filters: dict | None = None,
+        filters: dict[str, Any] | None = None,
         order: str | None = None,
-        with_: list[str] | None = None,
-    ) -> list[dict]:
-        params: dict = {"page": page, "limit": limit}
+        with_: List[str] | None = None,
+    ) -> List[dict[str, Any]]:
+        params: dict[str, Any] = {"page": page, "limit": limit}
         if filters:
             params.update(_build_filter_params(filters))
         if order:
             params.update(_build_order_params(order))
         if with_:
             params["with"] = ",".join(with_)
-        response = self.client.get(self.path, params=params)
+        try:
+            response = self.client.get(self.path, params=params)
+        except EntityNotFoundError:
+            return []  # 204 on list endpoint = empty collection
         if isinstance(response, dict):
             embedded = response.get("_embedded", {})
-            return embedded.get(self.embedded_key, [])
+            return cast(List[dict[str, Any]], embedded.get(self.embedded_key, []))
         return []
 
-    def get(self, id: int, with_: list[str] | None = None) -> dict:
-        params: dict = {}
+    def get(self, id: int, with_: List[str] | None = None) -> dict[str, Any]:
+        params: dict[str, Any] = {}
         if with_:
             params["with"] = ",".join(with_)
         result = self.client.get(f"{self.path}/{id}", params=params or None)
-        return result  # type: ignore[return-value]
+        return cast(dict[str, Any], result)
 
-    def create(self, items: list[dict]) -> list[dict]:
+    def create(self, items: List[dict[str, Any]]) -> List[dict[str, Any]]:
         response = self.client.post(self.path, json=items)
         if isinstance(response, dict):
             embedded = response.get("_embedded", {})
-            return embedded.get(self.embedded_key, [])
+            return cast(List[dict[str, Any]], embedded.get(self.embedded_key, []))
         return []
 
-    def update(self, id: int, data: dict) -> dict:
+    def update(self, id: int, data: dict[str, Any]) -> dict[str, Any]:
         result = self.client.patch(f"{self.path}/{id}", json=data)
-        return result  # type: ignore[return-value]
+        return cast(dict[str, Any], result)
 
-    def update_batch(self, items: list[dict]) -> list[dict]:
+    def update_batch(self, items: List[dict[str, Any]]) -> List[dict[str, Any]]:
         response = self.client.patch(self.path, json=items)
         if isinstance(response, list):
-            return response
+            return cast(List[dict[str, Any]], response)
         if isinstance(response, dict):
             embedded = response.get("_embedded", {})
-            return embedded.get(self.embedded_key, [])
+            return cast(List[dict[str, Any]], embedded.get(self.embedded_key, []))
         return []
 
     def delete(self, id: int) -> bool:
