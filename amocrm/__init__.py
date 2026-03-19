@@ -26,6 +26,11 @@ from amocrm.resources import (
     EventsResource,
     WebhooksResource,
     AccountResource,
+    LossReasonsResource,
+    CallsResource,
+    UnsortedResource,
+    FilesResource,
+    ChatsResource,
 )
 
 __all__ = [
@@ -49,4 +54,9 @@ __all__ = [
     "EventsResource",
     "WebhooksResource",
     "AccountResource",
+    "LossReasonsResource",
+    "CallsResource",
+    "UnsortedResource",
+    "FilesResource",
+    "ChatsResource",
 ]

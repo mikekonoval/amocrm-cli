@@ -14,6 +14,12 @@ from amocrm.commands.catalogs import app as catalogs_app
 from amocrm.commands.events import app as events_app
 from amocrm.commands.webhooks import app as webhooks_app
 from amocrm.commands.account import app as account_app
+from amocrm.commands.auth import app as auth_app
+from amocrm.commands.loss_reasons import app as loss_reasons_app
+from amocrm.commands.calls import app as calls_app
+from amocrm.commands.unsorted import app as unsorted_app
+from amocrm.commands.files import app as files_app
+from amocrm.commands.chats import app as chats_app
 
 app = typer.Typer(
     name="amocrm",
@@ -34,6 +40,12 @@ app.add_typer(catalogs_app, name="catalogs")
 app.add_typer(events_app, name="events")
 app.add_typer(webhooks_app, name="webhooks")
 app.add_typer(account_app, name="account")
+app.add_typer(auth_app, name="auth")
+app.add_typer(loss_reasons_app, name="loss-reasons")
+app.add_typer(calls_app, name="calls")
+app.add_typer(unsorted_app, name="unsorted")
+app.add_typer(files_app, name="files")
+app.add_typer(chats_app, name="chats")
 
 if __name__ == "__main__":
     app()

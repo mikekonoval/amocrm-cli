@@ -11,6 +11,11 @@ from amocrm.resources.catalogs import CatalogsResource, CatalogElementsResource
 from amocrm.resources.events import EventsResource
 from amocrm.resources.webhooks import WebhooksResource
 from amocrm.resources.account import AccountResource
+from amocrm.resources.loss_reasons import LossReasonsResource
+from amocrm.resources.calls import CallsResource
+from amocrm.resources.unsorted import UnsortedResource
+from amocrm.resources.files import FilesResource
+from amocrm.resources.chats import ChatsResource
 
 __all__ = [
     "LeadsResource",
@@ -30,4 +35,9 @@ __all__ = [
     "EventsResource",
     "WebhooksResource",
     "AccountResource",
+    "LossReasonsResource",
+    "CallsResource",
+    "UnsortedResource",
+    "FilesResource",
+    "ChatsResource",
 ]
