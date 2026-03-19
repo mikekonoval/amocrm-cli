@@ -1,5 +1,4 @@
 """Tests for custom_fields CLI commands."""
-import pytest
 from unittest.mock import patch, MagicMock
 from typer.testing import CliRunner
 from amocrm.commands.custom_fields import app

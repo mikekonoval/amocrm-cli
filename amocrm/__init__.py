@@ -8,12 +8,45 @@ Library usage:
 """
 from amocrm.client import AmoCRMClient
 from amocrm.exceptions import AmoCRMAPIError, EntityNotFoundError
-
-# Resource classes added by Wave 5 Agent A after all resources are implemented
-# from amocrm.resources import (LeadsResource, ContactsResource, ...)
+from amocrm.resources import (
+    LeadsResource,
+    ContactsResource,
+    CompaniesResource,
+    TasksResource,
+    NotesResource,
+    PipelinesResource,
+    StagesResource,
+    UsersResource,
+    RolesResource,
+    TagsResource,
+    CustomFieldsResource,
+    CustomFieldGroupsResource,
+    CatalogsResource,
+    CatalogElementsResource,
+    EventsResource,
+    WebhooksResource,
+    AccountResource,
+)
 
 __all__ = [
     "AmoCRMClient",
     "AmoCRMAPIError",
     "EntityNotFoundError",
+    "LeadsResource",
+    "ContactsResource",
+    "CompaniesResource",
+    "TasksResource",
+    "NotesResource",
+    "PipelinesResource",
+    "StagesResource",
+    "UsersResource",
+    "RolesResource",
+    "TagsResource",
+    "CustomFieldsResource",
+    "CustomFieldGroupsResource",
+    "CatalogsResource",
+    "CatalogElementsResource",
+    "EventsResource",
+    "WebhooksResource",
+    "AccountResource",
 ]

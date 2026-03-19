@@ -1,5 +1,4 @@
 """Tests for webhooks CLI commands."""
-import pytest
 from unittest.mock import patch, MagicMock
 from typer.testing import CliRunner
 from amocrm.commands.webhooks import app
