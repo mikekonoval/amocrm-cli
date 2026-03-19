@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Type checking & linting caches
+.mypy_cache/
+.ruff_cache/
+
+# Test caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE & tool configs
+.serena/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# AmoCRM credentials
+.amocrm/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Internal development artifacts
+skills/
+docs/superpowers/
+TODO.md
