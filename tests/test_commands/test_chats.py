@@ -73,6 +73,11 @@ def test_create_chat() -> None:
                 "--output", "json",
             ])
     assert result.exit_code == 0
+    mock_resource.create_chat.assert_called_once_with(
+        account_chat_id=ACCOUNT_CHAT_ID,
+        source_uid="ext-001",
+        contact_id=None,
+    )
 
 
 def test_disconnect() -> None:

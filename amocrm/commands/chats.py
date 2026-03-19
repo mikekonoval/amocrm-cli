@@ -7,10 +7,14 @@ import typer
 
 from amocrm.client import AmoCRMClient
 from amocrm.commands.output import render
-from amocrm.exceptions import AmoCRMAPIError
+from amocrm.exceptions import AmoCRMAPIError, EntityNotFoundError
 from amocrm.resources.chats import ChatsResource
 
 app = typer.Typer(name="chats", help="Manage chats via amojo API")
+
+
+def _get_resource() -> ChatsResource:
+    return ChatsResource(AmoCRMClient())
 
 
 @app.command("connect")
@@ -22,10 +26,10 @@ def connect(
 ) -> None:
     """Connect (register) a chat channel with AmoCRM."""
     try:
-        resource = ChatsResource(AmoCRMClient())
+        resource = _get_resource()
         result = resource.connect(account_chat_id=account_chat_id, title=title, hook_url=hook_url)
         render(result, output=output)
-    except AmoCRMAPIError as e:
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
         typer.echo(str(e), err=True)
         raise typer.Exit(1)
 
@@ -36,10 +40,10 @@ def disconnect(
 ) -> None:
     """Disconnect the chat channel."""
     try:
-        resource = ChatsResource(AmoCRMClient())
+        resource = _get_resource()
         resource.disconnect(account_chat_id=account_chat_id)
         typer.echo(f"Chat channel {account_chat_id} disconnected.")
-    except AmoCRMAPIError as e:
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
         typer.echo(str(e), err=True)
         raise typer.Exit(1)
 
@@ -53,14 +57,14 @@ def create_chat(
 ) -> None:
     """Create a new chat conversation."""
     try:
-        resource = ChatsResource(AmoCRMClient())
+        resource = _get_resource()
         result = resource.create_chat(
             account_chat_id=account_chat_id,
             source_uid=source_uid,
             contact_id=contact_id,
         )
         render(result, output=output)
-    except AmoCRMAPIError as e:
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
         typer.echo(str(e), err=True)
         raise typer.Exit(1)
 
@@ -76,7 +80,7 @@ def send_message(
 ) -> None:
     """Send a message in a chat conversation."""
     try:
-        resource = ChatsResource(AmoCRMClient())
+        resource = _get_resource()
         result = resource.send_message(
             account_chat_id=account_chat_id,
             chat_id=chat_id,
@@ -85,6 +89,6 @@ def send_message(
             sender_name=sender_name,
         )
         render(result, output=output)
-    except AmoCRMAPIError as e:
+    except (AmoCRMAPIError, EntityNotFoundError) as e:
         typer.echo(str(e), err=True)
         raise typer.Exit(1)
