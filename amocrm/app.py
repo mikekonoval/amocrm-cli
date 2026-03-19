@@ -8,6 +8,7 @@ app = typer.Typer(
 )
 
 # Command groups registered here
+from amocrm.commands.account import app as account_app
 from amocrm.commands.leads import app as leads_app
 from amocrm.commands.contacts import app as contacts_app
 from amocrm.commands.companies import app as companies_app
@@ -21,6 +22,7 @@ from amocrm.commands.custom_fields import app as custom_fields_app
 from amocrm.commands.events import app as events_app
 from amocrm.commands.webhooks import app as webhooks_app
 
+app.add_typer(account_app, name="account")
 app.add_typer(leads_app, name="leads")
 app.add_typer(contacts_app, name="contacts")
 app.add_typer(companies_app, name="companies")
